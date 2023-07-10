@@ -1,0 +1,10 @@
+15:48:48 **** Incremental Build of configuration Debug for project balanceCopter-STM32 ****
+make -j12 all 
+arm-none-eabi-size   balanceCopter-STM32.elf 
+   text	   data	    bss	    dec	    hex	filename
+  11288	     20	   1924	  13232	   33b0	balanceCopter-STM32.elf
+Finished building: default.size.stdout
+ 
+
+15:48:48 Build Finished. 0 errors, 0 warnings. (took 508ms)
+
