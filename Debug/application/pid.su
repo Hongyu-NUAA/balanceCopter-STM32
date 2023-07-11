@@ -1,3 +1,0 @@
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/pid.c:50:6:PID_init	32	static
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/pid.c:79:6:PID_calc	24	static
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/pid.c:125:6:PID_clear	16	static
