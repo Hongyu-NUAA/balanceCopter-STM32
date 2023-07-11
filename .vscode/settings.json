@@ -1,0 +1,19 @@
+{
+    "C_Cpp.autoAddFileAssociations": false,
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "*.cpp": "cpp",
+        "*.hpp": "cpp",
+        "Sconstruct": "python",
+        "SConscript": "python",
+    },
+    "C_Cpp.errorSquiggles": "Disabled",
+    "git.ignoreLimitWarning": true,
+    "cmake.configureOnOpen": false,
+    "editor.defaultFormatter": "xaver.clang-format",
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "clang-format.executable": "C://Users//Luviewer//.vscode//extensions//ms-vscode.cpptools-1.16.3-win32-x64//LLVM//bin//clang-format.exe"
+}
