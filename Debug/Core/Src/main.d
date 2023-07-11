@@ -26,11 +26,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Core/Inc/can.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
- D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/CAN_receive.h \
- D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/boards/bsp_can.h \
- D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/struct_typedef.h \
- D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/pid.h \
- D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/struct_typedef.h
+ ../application/CAN_receive.h ../boards/bsp_can.h \
+ ../application/struct_typedef.h ../application/pid.h \
+ ../application/struct_typedef.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -61,8 +59,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/can.h:
 ../Core/Inc/main.h:
 ../Core/Inc/gpio.h:
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/CAN_receive.h:
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/boards/bsp_can.h:
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/struct_typedef.h:
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/pid.h:
-D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application/struct_typedef.h:
+../application/CAN_receive.h:
+../boards/bsp_can.h:
+../application/struct_typedef.h:
+../application/pid.h:
+../application/struct_typedef.h:

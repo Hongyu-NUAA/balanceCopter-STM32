@@ -9,8 +9,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include boards/subdir.mk
--include application/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -62,8 +60,8 @@ all: main-build
 main-build: balanceCopter-STM32.elf secondary-outputs
 
 # Tool invocations
-balanceCopter-STM32.elf balanceCopter-STM32.map: $(OBJS) $(USER_OBJS) D:\GitRepo\balanceCopter-STM32\balanceCopter-STM32\STM32F407IGHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "balanceCopter-STM32.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\GitRepo\balanceCopter-STM32\balanceCopter-STM32\STM32F407IGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="balanceCopter-STM32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+balanceCopter-STM32.elf balanceCopter-STM32.map: $(OBJS) $(USER_OBJS) D:\GitRepo\STM32CUBEIDE\balanceCopter-STM32\STM32F407IGHX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "balanceCopter-STM32.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\GitRepo\STM32CUBEIDE\balanceCopter-STM32\STM32F407IGHX_FLASH.ld" --specs=nosys.specs -Wl,-Map="balanceCopter-STM32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
