@@ -34,12 +34,14 @@ union ardupilot_t {
     uint8_t bits[sizeof(struct ardupilot_struct)];
 };
 
+void bsp_uart_parse(uint8_t data);
 
 void bsp_uart1_set_wheel_speed(int16_t wheelleft, int16_t wheelright);
 
-void bsp_uart1_handler(void);
+void bsp_uart_get_wheel_speed(int16_t* wheelleft, int16_t* wheelright);
+
 void bsp_uart1_init(void);
-void bsp_uart1_rx(void);
+
 void bsp_uart1_tx(void);
 
 
