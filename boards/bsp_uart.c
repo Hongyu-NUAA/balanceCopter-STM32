@@ -8,56 +8,86 @@ float wheel_left_target;
 float wheel_right_target;
 
 uint8_t UART1_RX_BUF[RM_UART_MAX_LEN]; // 缓存数组
-uint8_t UART1_RX_LEN;                  // 缓存数组长度
+uint8_t UART1_RX_DATA;
 
 union rmuart_t rmuart_rx;
 union ardupilot_t ardupilot_tx;
 
 ///////////////////////////////////////////////////////////////////////////
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if(huart ->Instance == USART1)
+    {
+    	bsp_uart_parse(UART1_RX_DATA);
+		//等待下一次接收中断
+		HAL_UART_Receive_IT(huart,&UART1_RX_DATA,1);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////
 void bsp_uart1_init(void)
 {
-    __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);                  // 开启串口空闲中断，必须调用
-    HAL_UART_Receive_DMA(&huart1, UART1_RX_BUF, RM_UART_MAX_LEN); // 启动DMA接收
+	//开启接收中断
+	HAL_UART_Receive_IT(&huart1, &UART1_RX_DATA, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern UART_HandleTypeDef huart1;
-
-void bsp_uart1_handler(void)
+void bsp_uart_parse(uint8_t data)
 {
-    if ((__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE) != RESET)) {
-        __HAL_UART_CLEAR_IDLEFLAG(&huart1);                           // 清除标志位
-        HAL_UART_DMAStop(&huart1);                                    // 停止DMA接收，防止数据出错
+	static uint8_t rx_step=0;
+	static uint8_t rx_count;
+	switch(rx_step)
+	{
+	case 0:
+		if(data == 0xAA)
+		{
+			rx_step = 1;
+			UART1_RX_BUF[rx_count++] = data;
+		} else {
+			rx_step=0;
+			rx_count=0;
+		}
+		break;
 
-        UART1_RX_LEN = 200 - __HAL_DMA_GET_COUNTER(&hdma_usart1_rx);  // 获取DMA中传输的数据个数
+	case 1:
+		if(data == 0xAF)
+		{
+			rx_step = 2;
+			UART1_RX_BUF[rx_count++] = data;
+		} else {
+			rx_step=0;
+			rx_count=0;
+		}
+		break;
 
-        memcpy(rmuart_rx.bits, UART1_RX_BUF, UART1_RX_LEN);           // 更新数据
 
-        HAL_UART_Receive_DMA(&huart1, UART1_RX_BUF, RM_UART_MAX_LEN); // 打开DMA接收，数据存入 UART1_RX_BUF 数组中
-    }
-}
+	case 2:
+		if(data == sizeof(struct rmuart_struct))
+		{
+			rx_step = 3;
+			UART1_RX_BUF[rx_count++] = data;
+		} else {
+			rx_step=0;
+			rx_count=0;
+		}
+		break;
 
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-void bsp_uart1_rx()
-{
-    if (rmuart_rx.rmuart_s.header[0] != 0xAA) {
-        return;
-    }
+	case 3:
+		UART1_RX_BUF[rx_count++] = data;
 
-    if (rmuart_rx.rmuart_s.header[1] != 0xAF) {
-        return;
-    }
+		if(rx_count >= sizeof(struct rmuart_struct))
+		{
+			memcpy(rmuart_rx.bits, UART1_RX_BUF, sizeof(struct rmuart_struct));
+			rx_step=0;
+			rx_count=0;
+		}
+		break;
 
-    if (rmuart_rx.rmuart_s.len != sizeof(struct rmuart_struct)) {
-        return;
-    }
-
-    wheel_left_target = rmuart_rx.rmuart_s.wheel_left;
-    wheel_right_target = rmuart_rx.rmuart_s.wheel_right;
+	default:
+		rx_step=0;
+		rx_count=0;
+		break;
+	}
 }
 
 void bsp_uart1_tx(void)
@@ -74,4 +104,10 @@ void bsp_uart1_set_wheel_speed(int16_t wheelleft, int16_t wheelright)
 {
     ardupilot_tx.ardupilot_s.wheel_left_speed = wheelleft;
     ardupilot_tx.ardupilot_s.wheel_right_speed = wheelright;
+}
+
+void bsp_uart_get_wheel_speed(int16_t* wheelleft, int16_t* wheelright)
+{
+	*wheelleft = rmuart_rx.rmuart_s.wheel_left;
+	*wheelright = rmuart_rx.rmuart_s.wheel_right;
 }
