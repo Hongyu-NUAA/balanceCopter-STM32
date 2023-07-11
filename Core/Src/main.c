@@ -58,9 +58,9 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-pid_type_def motor_pid_1;            // 声明PID数据结构体
+pid_type_def motor_pid_1;            // 声明PID数据结构�?
 pid_type_def motor_pid_2;
-const motor_measure_t* motor_data_1; // 声明电机结构体指针
+const motor_measure_t* motor_data_1; // 声明电机结构体指�?
 const motor_measure_t* motor_data_2;
 const fp32 PID[3] = { 3, 0.1, 0.1 }; // P,I,D参数
 
@@ -101,10 +101,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 //  can_filter_init();
-  PID_init(&motor_pid_1, PID_POSITION, PID, 16000, 2000); // PID结构体，PID计算模式，PID参数，最大值，最大I值
-  PID_init(&motor_pid_2, PID_POSITION, PID, 16000, 2000); // PID结构体，PID计算模式，PID参数，最大值，最大I值
-  motor_data_1 = get_chassis_motor_measure_point(0);      // 获取ID为1号的电机数据指针
-  motor_data_2 = get_chassis_motor_measure_point(1);      // 获取ID为2号的电机数据指针
+  PID_init(&motor_pid_1, PID_POSITION, PID, 16000, 2000); // PID结构体，PID计算模式，PID参数，最大�?�，�?大I�?
+  PID_init(&motor_pid_2, PID_POSITION, PID, 16000, 2000); // PID结构体，PID计算模式，PID参数，最大�?�，�?大I�?
+  motor_data_1 = get_chassis_motor_measure_point(0);      // 获取ID�?1号的电机数据指针
+  motor_data_2 = get_chassis_motor_measure_point(1);      // 获取ID�?2号的电机数据指针
 
   /* USER CODE END 2 */
 
@@ -115,10 +115,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	PID_calc(&motor_pid_1, motor_data_1->speed_rpm, motor_target_f[0]); // 计算电机pid输出，PID结构体，实际速度，设定速度
-	PID_calc(&motor_pid_2, motor_data_2->speed_rpm, -motor_target_f[1]); // 计算电机pid输出，PID结构体，实际速度，设定速度
+	PID_calc(&motor_pid_1, motor_data_1->speed_rpm, motor_target_f[0]); // 计算电机pid输出，PID结构体，实际速度，设定�?�度
+	PID_calc(&motor_pid_2, motor_data_2->speed_rpm, -motor_target_f[1]); // 计算电机pid输出，PID结构体，实际速度，设定�?�度
 
-	CAN_cmd_chassis(motor_pid_1.out, motor_pid_2.out, 0, 0);            // 发送计算后的控制电流给电机1和电机2，电机3和4在这里为0
+	CAN_cmd_chassis(motor_pid_1.out, motor_pid_2.out, 0, 0);            // 发�?�计算后的控制电流给电机1和电�?2，电�?3�?4在这里为0
 
 	HAL_Delay(2);
   }
