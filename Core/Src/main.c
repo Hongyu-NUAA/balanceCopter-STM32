@@ -100,7 +100,7 @@ int main(void)
   MX_CAN2_Init();
   /* USER CODE BEGIN 2 */
 
-  can_filter_init();
+//  can_filter_init();
   PID_init(&motor_pid_1, PID_POSITION, PID, 16000, 2000); // PID结构体，PID计算模式，PID参数，最大值，最大I值
   PID_init(&motor_pid_2, PID_POSITION, PID, 16000, 2000); // PID结构体，PID计算模式，PID参数，最大值，最大I值
   motor_data_1 = get_chassis_motor_measure_point(0);      // 获取ID为1号的电机数据指针

@@ -33,12 +33,12 @@
 		<link>
 			<name>application</name>
 			<type>2</type>
-			<location>D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/application</location>
+			<location>D:/GitRepo/STM32CUBEIDE/balanceCopter-STM32/application</location>
 		</link>
 		<link>
 			<name>boards</name>
 			<type>2</type>
-			<location>D:/GitRepo/balanceCopter-STM32/balanceCopter-STM32/boards</location>
+			<location>D:/GitRepo/STM32CUBEIDE/balanceCopter-STM32/boards</location>
 		</link>
 	</linkedResources>
 </projectDescription>
