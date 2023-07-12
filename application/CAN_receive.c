@@ -1,5 +1,7 @@
 #include "CAN_receive.h"
 
+extern CAN_HandleTypeDef hcan1;
+
 // motor data read
 #define get_motor_measure(ptr, data)                                   \
     {                                                                  \
