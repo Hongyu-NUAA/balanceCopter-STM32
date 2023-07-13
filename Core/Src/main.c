@@ -20,6 +20,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "can.h"
+#include "dma.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -63,19 +64,13 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-pid_type_def motor_pid_1;            // 澹版槑PID鏁版嵁缁撴�?�锟�???????
-pid_type_def motor_pid_2;
-const motor_measure_t* motor_data_1; // 澹版槑鐢垫満缁撴瀯浣撴寚锟�???
-const motor_measure_t* motor_data_2;
-const fp32 PID[3] = {6.0, 0.3, 0.1 }; // P,I,D鍙傛�????
+//pid_type_def motor_pid_1;            // 澹版槑PID鏁版嵁缁撴�?�锟�????????
+//pid_type_def motor_pid_2;
 
-int16_t motor_target_f_left;
-int16_t motor_target_f_right;
-int16_t motor_wheel_left;
-int16_t motor_wheel_right;
-float motor_low_pass_alpha = 0.84;
+//const fp32 PID[3] = {6.0, 0.3, 0.1 }; // P,I,D鍙傛�?????
 
-int last_tick, current_tick;
+
+
 
 /* USER CODE END 0 */
 
@@ -107,17 +102,17 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_CAN1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  can_filter_init();
-  PID_init(&motor_pid_1, PID_POSITION, PID, 16000, 2000); // PID缁撴瀯浣擄紝PID璁＄畻妯″紡锛孭ID鍙傛暟锛屾渶澶э拷?锟斤紝锟�???????澶锟�???
-  PID_init(&motor_pid_2, PID_POSITION, PID, 16000, 2000); // PID缁撴瀯浣擄紝PID璁＄畻妯″紡锛孭ID鍙傛暟锛屾渶澶э拷?锟斤紝锟�???????澶锟�???
-  motor_data_1 = get_chassis_motor_measure_point(0);      // 鑾峰彇ID锟�???1鍙风殑鐢垫満鏁版嵁鎸囬拡
-  motor_data_2 = get_chassis_motor_measure_point(1);      // 鑾峰彇ID锟�???2鍙风殑鐢垫満鏁版嵁鎸囬拡
+//  can_filter_init();
+//  PID_init(&motor_pid_1, PID_POSITION, PID, 16000, 2000); // PID缁撴瀯浣擄紝PID璁＄畻妯″紡锛孭ID鍙傛暟锛屾渶澶э拷?锟斤紝锟�????????澶锟�???
+//  PID_init(&motor_pid_2, PID_POSITION, PID, 16000, 2000); // PID缁撴瀯浣擄紝PID璁＄畻妯″紡锛孭ID鍙傛暟锛屾渶澶э拷?锟斤紝锟�????????澶锟�???
+//  motor_data_1 = get_chassis_motor_measure_point(0);      // 鑾峰彇ID锟�???1鍙风殑鐢垫満鏁版嵁鎸囬拡
+//  motor_data_2 = get_chassis_motor_measure_point(1);      // 鑾峰彇ID锟�???2鍙风殑鐢垫満鏁版嵁鎸囬拡
 
-   bsp_uart1_init();
 
   /* USER CODE END 2 */
 
@@ -136,15 +131,15 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 //	bsp_uart1_rx();
-	  current_tick = HAL_GetTick();
-
-	  if((current_tick-last_tick)>10)
-	  {
-		  last_tick = current_tick;
-
-		  bsp_uart1_set_wheel_speed(motor_wheel_left, motor_wheel_right);
-		  bsp_uart1_tx();
-	  }
+//	  current_tick = HAL_GetTick();
+//
+//	  if((current_tick-last_tick)>10)
+//	  {
+//		  last_tick = current_tick;
+//
+//		  bsp_uart1_set_wheel_speed(motor_wheel_left, motor_wheel_right);
+//		  bsp_uart1_tx();
+//	  }
 
 	/////////////////////////////////
 //	CAN_get_Motor_Data(&hcan1);
@@ -152,19 +147,19 @@ int main(void)
 //	motor_target_f_left = 1000;
 //	motor_target_f_right = 1000;
 
-//	motor_wheel_left =  (float)motor_data_1->speed_rpm *motor_low_pass_alpha + (1-motor_low_pass_alpha) * motor_wheel_left; //�?阶低通滤�?
-//	motor_wheel_right =  (float)motor_data_2->speed_rpm *motor_low_pass_alpha + (1-motor_low_pass_alpha) * motor_wheel_right; //�?阶低通滤�?
-	  motor_wheel_left =  motor_data_1->speed_rpm;
-	  motor_wheel_right =  motor_data_2->speed_rpm;
-
-	bsp_uart_get_wheel_speed(&motor_target_f_left, &motor_target_f_right);
-
-	PID_calc(&motor_pid_1,(float)motor_wheel_left, (float)motor_target_f_left); // 璁＄畻鐢垫満pid杈撳嚭锛孭ID缁撴瀯浣擄紝瀹為檯閫熷害锛岃�?�氾�?????锟藉�????
-	PID_calc(&motor_pid_2, (float)motor_wheel_right, -(float)motor_target_f_right); // 璁＄畻鐢垫満pid杈撳嚭锛孭ID缁撴瀯浣擄紝瀹為檯閫熷害锛岃�?�氾�?????锟藉�????
-
-	CAN_cmd_chassis(motor_pid_1.out, motor_pid_2.out, 0, 0);            // 鍙戯�?????锟�?�绠楀悗鐨勬帶鍒剁數娴佺粰鐢垫�????1鍜岀數锟�???????2锛岀數锟�???????3锟�???4鍦ㄨ繖閲屼负0
-
-	HAL_Delay(2);
+//	motor_wheel_left =  (float)motor_data_1->speed_rpm *motor_low_pass_alpha + (1-motor_low_pass_alpha) * motor_wheel_left; //�??阶低通滤�??
+//	motor_wheel_right =  (float)motor_data_2->speed_rpm *motor_low_pass_alpha + (1-motor_low_pass_alpha) * motor_wheel_right; //�??阶低通滤�??
+//	  motor_wheel_left =  motor_data_1->speed_rpm;
+//	  motor_wheel_right =  motor_data_2->speed_rpm;
+//
+//	bsp_uart_get_wheel_speed(&motor_target_f_left, &motor_target_f_right);
+//
+//	PID_calc(&motor_pid_1,(float)motor_wheel_left, (float)motor_target_f_left); // 璁＄畻鐢垫満pid杈撳嚭锛孭ID缁撴瀯浣擄紝瀹為檯閫熷害锛岃�?�氾�??????锟藉�?????
+//	PID_calc(&motor_pid_2, (float)motor_wheel_right, -(float)motor_target_f_right); // 璁＄畻鐢垫満pid杈撳嚭锛孭ID缁撴瀯浣擄紝瀹為檯閫熷害锛岃�?�氾�??????锟藉�?????
+//
+//	CAN_cmd_chassis(motor_pid_1.out, motor_pid_2.out, 0, 0);            // 鍙戯�??????锟�?�绠楀悗鐨勬帶鍒剁數娴佺粰鐢垫�?????1鍜岀數锟�????????2锛岀數锟�????????3锟�???4鍦ㄨ繖閲屼负0
+//
+//	HAL_Delay(2);
   }
   /* USER CODE END 3 */
 }

@@ -25,7 +25,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "CAN_receive.h"
+#include "bsp_can.h"
+#include "pid.h"
 
+#include "bsp_uart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +50,15 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
+int16_t motor_target_f_left_int;
+int16_t motor_target_f_right_int;
+
+int16_t motor_wheel_left_int;
+int16_t motor_wheel_right_int;
+
+const motor_measure_t* motor_data_left; // 澹版槑鐢垫満缁撴瀯浣撴寚锟�???
+const motor_measure_t* motor_data_right;
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -57,6 +70,21 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+osThreadId_t canTaskHandle;
+const osThreadAttr_t canTask_attributes = {
+  .name = "canTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+void canTask(void *argument);
+
+osThreadId_t uartTaskHandle;
+const osThreadAttr_t uartTask_attributes = {
+  .name = "uartTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+void uartTask(void *argument);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -96,6 +124,9 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  canTaskHandle = osThreadNew(canTask, NULL, &canTask_attributes);
+  uartTaskHandle = osThreadNew(uartTask, NULL, &uartTask_attributes);
+
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -117,13 +148,50 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+void canTask(void *argument)
+{
+	can_filter_init();
 
+	motor_data_left = get_chassis_motor_measure_point(0);      // 鑾峰彇ID锟�???1鍙风殑鐢垫満鏁版嵁鎸囬拡
+	motor_data_right = get_chassis_motor_measure_point(1);      // 鑾峰彇ID锟�???2鍙风殑鐢垫満鏁版嵁鎸囬拡
+
+	motor_target_f_left_int = 0;
+	motor_target_f_right_int = 0;
+
+  for(;;)
+  {
+	  motor_wheel_left_int =  motor_data_left->speed_rpm;
+	  motor_wheel_right_int =  -motor_data_right->speed_rpm;
+
+	  bsp_uart_get_target_wheel_speed(&motor_target_f_left_int, &motor_target_f_right_int);
+
+	  CAN_cmd_chassis(motor_target_f_left_int, -motor_target_f_right_int, 0, 0);
+
+	  osDelay(2);
+  }
+  /* USER CODE END StartDefaultTask */
+}
+
+void uartTask(void *argument)
+{
+   bsp_uart1_init();
+
+
+  for(;;)
+  {
+	  bsp_uart1_get_feedback_wheel_speed(motor_data_left->speed_rpm, -motor_data_right->speed_rpm);
+	  bsp_uart1_tx();
+
+	  osDelay(3);
+  }
+  /* USER CODE END StartDefaultTask */
+}
 /* USER CODE END Application */
 
